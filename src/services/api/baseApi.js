@@ -29,9 +29,11 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const { removeCredentials } = useUserStore.getState();
+    if (error.response && error.response.status === 401) {
+      const { removeCredentials } = useUserStore.getState();
 
-    removeCredentials();
+      removeCredentials();
+    }
     return Promise.reject(error);
   }
 );

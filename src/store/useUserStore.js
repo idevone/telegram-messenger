@@ -7,8 +7,8 @@ import {
 
 const initialState = {
   user: {
+    first_name: null,
     username: null,
-    role: null,
   },
   accessToken: null,
   isLoggedIn: false,
@@ -18,12 +18,12 @@ const useUserStoreBase = create(
   persist(
     (set) => ({
       ...initialState,
-      setCredentials: ({ user, accessToken }) =>
-        set({
+      setCredentials: ({ user, access_token }) =>
+        set((state) => ({
           user,
-          accessToken,
+          accessToken: access_token || state.accessToken,
           isLoggedIn: true,
-        }),
+        })),
       removeCredentials: () =>
         set({
           ...initialState,

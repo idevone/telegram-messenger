@@ -7,15 +7,26 @@ import Container from "@mui/material/Container";
 import { useState } from "react";
 import { login } from "../../services/api/auth/authApi";
 import { useMutation } from "@tanstack/react-query";
+import { useUserStoreHook } from "../../store/useUserStore";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const setCredentials = useUserStoreHook.useSetCredentials();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const loginMutation = useMutation({
     mutationKey: "auth",
     mutationFn: (values) => login(values),
+    onSuccess: (data) => {
+      setCredentials(data);
+      navigate({
+        to: location.search.redirect ?? "/",
+      });
+    },
   });
 
   const handleSubmit = (event) => {

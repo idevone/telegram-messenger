@@ -1,7 +1,21 @@
-import { List, Box, Typography } from "@mui/material";
+import { List, Box, Typography, LinearProgress } from "@mui/material";
 import AccountItem from "../../modules/AccountItem/AccountItem";
+import { useQuery } from "@tanstack/react-query";
+import { allAccounts } from "../../services/api/telegram/telegramApi";
 
 export default function HomePage() {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["accounts"],
+    queryFn: allAccounts,
+  });
+  const el = data.map((account) => (
+    <AccountItem
+      key={account?.id}
+      first_name={account?.first_name}
+      username={account?.username}
+      telegram_id={account?.telegram_id}
+    />
+  ));
   return (
     <Box
       sx={{
@@ -29,7 +43,8 @@ export default function HomePage() {
           flexDirection: "column",
         }}
       >
-        <AccountItem />
+        {el}
+        {isLoading && <LinearProgress />}
       </List>
     </Box>
   );

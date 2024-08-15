@@ -7,14 +7,26 @@ import {
 } from "@mui/material";
 import { Folder } from "@mui/icons-material";
 import { useNavigate } from "@tanstack/react-router";
-export default function AccountItem() {
+import { useUserStoreHook } from "../../store/useUserStore";
+export default function AccountItem({
+  first_name = "",
+  username = "",
+  telegram_id = "",
+}) {
   const navigate = useNavigate();
+  const setCredentials = useUserStoreHook.useSetCredentials();
 
-  const onclick = () => {
+  const onclick = (id) => {
+    setCredentials({
+      user: {
+        first_name,
+        username,
+      },
+    });
     navigate({
       to: "/account/$accountId",
       params: {
-        accountId: 12,
+        accountId: id,
       },
     });
   };
@@ -27,7 +39,7 @@ export default function AccountItem() {
           borderRadius: "10px",
         }}
         secondaryAction={
-          <Button onClick={() => onclick()} variant="contained">
+          <Button onClick={() => onclick(telegram_id)} variant="contained">
             Войти
           </Button>
         }
@@ -37,7 +49,7 @@ export default function AccountItem() {
             <Folder />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText primary="Single-line item" secondary={"Secondary text"} />
+        <ListItemText primary={first_name} secondary={username} />
       </ListItem>
     </>
   );

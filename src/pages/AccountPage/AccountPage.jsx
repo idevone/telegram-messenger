@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { allChats } from "../../services/api/telegram/telegramApi";
 import AccountMessages from "../../modules/AccountMessages/AccountMessages";
 import AccountChats from "../../modules/AccountChats/AccountChats";
-import { useState } from "react";
 import AccountPanelAction from "../../modules/AccountPanelAction/AccountPanelAction";
 
 export default function AccountPage() {
@@ -29,7 +28,7 @@ export default function AccountPage() {
       }}
     >
       <AccountChats isLoading={isLoading} chats={data} activeChat={chatId} />
-      <AccountMessages />
+      <AccountMessages chats={data} />
       <AccountPanelAction />
     </MainContainer>
   );

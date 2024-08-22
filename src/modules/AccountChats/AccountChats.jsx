@@ -4,14 +4,17 @@ import {
   Search,
   Conversation,
   ConversationList,
+  ConversationHeader,
 } from "@chatscope/chat-ui-kit-react";
 import { useNavigate } from "@tanstack/react-router";
+import { useUserStoreHook } from "../../store/useUserStore";
 export default function AccountChats({
   chats = [],
   activeChat,
   isLoading = false,
 }) {
   const navigate = useNavigate();
+  const user = useUserStoreHook.useUser();
 
   const onActiveChat = (chatId) =>
     navigate({
@@ -35,7 +38,19 @@ export default function AccountChats({
   ));
   return (
     <Sidebar position="left">
-      <Search placeholder="Search..." />
+      <ConversationHeader>
+        <ConversationHeader.Back
+          onClick={() =>
+            navigate({
+              to: "/account",
+            })
+          }
+        />
+        <ConversationHeader.Content
+          userName={user?.first_name ?? ""}
+          info={user?.username ?? ""}
+        />
+      </ConversationHeader>
       <ConversationList loading={isLoading}>{el}</ConversationList>
     </Sidebar>
   );

@@ -4,11 +4,12 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../../services/api/auth/authApi";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStoreHook } from "../../store/useUserStore";
 import { useLocation, useNavigate } from "@tanstack/react-router";
+import { LinearProgress, Alert } from "@mui/material";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -33,6 +34,28 @@ export default function LoginPage() {
     event.preventDefault();
     loginMutation.mutate({ username, password });
   };
+
+  useEffect(() => {
+    if (loginMutation.isError) {
+      switch (loginMutation.error.response?.status) {
+        case 400:
+          setError("Не все поля заполнены!");
+          break;
+        case 401:
+          setError("Неверный пароль!");
+          break;
+        case 403:
+          setError("Ваш аккаунт заблокирован!");
+          break;
+        case 404:
+          setError("Пользователь не найден!");
+          break;
+        default:
+          setError("Ошибка сервера!");
+          break;
+      }
+    }
+  }, [loginMutation.isError, loginMutation.error]);
 
   return (
     <Container component="main" maxWidth="xs" sx={{ marginTop: "200px" }}>
@@ -70,14 +93,19 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Войти
-          </Button>
+          {loginMutation.isPending ? (
+            <LinearProgress />
+          ) : (
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Войти
+            </Button>
+          )}
+          {loginMutation.isError && <Alert severity="error">{error}</Alert>}
         </Box>
       </Box>
     </Container>

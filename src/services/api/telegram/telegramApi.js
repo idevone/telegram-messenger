@@ -16,3 +16,11 @@ export const allMessagesChat = async ({ accountId, chatId }) => {
   );
   return response.data;
 };
+
+export const sendMessage = async ({ accountId, chatId, text }) => {
+  const response = await instance.post(
+    `telegram/send-message/${accountId}/${chatId}`,
+    { text }
+  );
+  return response.data;
+};

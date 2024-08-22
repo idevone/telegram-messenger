@@ -7,19 +7,36 @@ import {
   Avatar,
   MessageSeparator,
 } from "@chatscope/chat-ui-kit-react";
-import { useUserStoreHook } from "../../store/useUserStore";
-import { useQuery } from "@tanstack/react-query";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useSearch } from "@tanstack/react-router";
-import { allMessagesChat } from "../../services/api/telegram/telegramApi";
+import {
+  allMessagesChat,
+  sendMessage,
+} from "../../services/api/telegram/telegramApi";
 import { format } from "date-fns";
-export default function AccountMessages() {
+import { useEffect, useState } from "react";
+export default function AccountMessages({ chats = [] }) {
   const { accountId } = useParams({ strict: false });
   const { chatId = "" } = useSearch({ strict: false });
-  const user = useUserStoreHook.useUser();
+  const [chat, setChat] = useState({ id: "", title: "" });
+
+  const queryClient = useQueryClient();
   const { data = [], isLoading } = useQuery({
     queryKey: ["messages", accountId, chatId],
     queryFn: () => allMessagesChat({ accountId, chatId }),
     enabled: !!chatId,
+  });
+
+  useEffect(() => {
+    const c = chats.find((chat) => chat.id === chatId);
+    setChat(c);
+  }, [chatId]);
+
+  const sendMutation = useMutation({
+    mutationKey: "messages",
+    mutationFn: (text) => sendMessage({ accountId, chatId, text }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: "messages" }),
   });
 
   console.log(data);
@@ -46,8 +63,8 @@ export default function AccountMessages() {
       <ConversationHeader>
         <ConversationHeader.Back />
         <ConversationHeader.Content
-          userName={user?.first_name ?? ""}
-          info={user?.username}
+          userName={chat?.title ?? ""}
+          info={chat?.id ?? ""}
         />
       </ConversationHeader>
       <MessageList loading={isLoading}>
@@ -76,7 +93,10 @@ export default function AccountMessages() {
           />
         </Message> */}
       </MessageList>
-      <MessageInput placeholder="Type message here" />
+      <MessageInput
+        placeholder="Type message here"
+        onSend={(innerHtml, text, innerText) => sendMutation.mutate(text)}
+      />
     </ChatContainer>
   );
 }

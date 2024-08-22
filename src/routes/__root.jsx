@@ -4,7 +4,7 @@ import { Container } from "@mui/material";
 export const Route = createRootRoute({
   component: () => {
     return (
-      <Container>
+      <Container maxWidth="xl">
         <Outlet />
         <TanStackRouterDevtools />
       </Container>
